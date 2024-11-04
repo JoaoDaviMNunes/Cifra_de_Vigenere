@@ -4,9 +4,16 @@
 
 # ====================== IMPORTS ======================
 import os
+import sys
 from unicodedata import normalize
 
 # ====================== FUNÇÕES AUXILIARES ======================
+
+# Função para retirar da string os caracteres especiais e os espaços, além de colocar todas letras em maiúsculo
+def processar_texto(texto):
+    texto = normalize("NFKD", texto).encode("ASCII", "ignore").decode("ASCII")
+    texto = "".join(texto.split()).upper()
+    return texto
 
 # Função auxiliar para expandir a palavra-chave até o tamanho do texto
 def expandir_palavra_chave(texto, palavra_chave):
@@ -50,27 +57,45 @@ def coder_vigerene(texto_claro, palavra_chave):
         
     return texto_cifrado
 
-# Limpando a tela para que seja realizada a cifragem e a decifragem da Cifra de Vigenère
-os.system("cls" if os.name == "nt" else "clear")
+if __name__ ==  "__main__":
+    # Limpa a tela para que seja realizada a cifragem e a decifragem da Cifra de Vigenère
+    os.system("cls" if os.name == "nt" else "clear")
 
-# Inserindo o texto que será cifrado
-texto_claro = input("\nDigite o texto que deseja cifrar: ")
-# Inserindo a palavra-palavra-chave da cifra de Vigenére
-palavra_chave = input("Digite a palavra-chave (que seja menor que o texto): ")
+    # Verifica se foi passado tudo pela linha de comando ou Terminal
+    if len(sys.argv) < 4:
+        print("Uso errado pelo Terminal! Forma correta do comando:")
+        print("python3 coder-vigenere.py <arquivo_entrada_texto_claro> <arquivo_saida_texto_cifrado> <chave_ou_arquivo>")
+        sys.exit(1)
 
-# Retira os caracteres especiais ou letras com acento do texto claro e da palavra-chave
-texto_claro = normalize("NFKD", texto_claro).encode("ASCII", "ignore").decode("ASCII")
-palavra_chave = normalize("NFKD", palavra_chave).encode("ASCII", "ignore").decode("ASCII")
+    # Coloca nas variáveis as informações obtidas pelo Terminal
+    arquivo_entrada = sys.argv[1]
+    arquivo_saida = sys.argv[2]
+    chave_ou_arquivo = sys.argv[3]
 
-# Une as palavras e transforma o texto claro e a palavra-chave em letras maiúsculas
-texto_claro = "".join(texto_claro.split())
-texto_claro = texto_claro.upper()
-palavra_chave = "".join(palavra_chave.split())
-palavra_chave = palavra_chave.upper()
+    # Leitura do texto claro a partir do arquivo de entrada
+    with open(arquivo_entrada, 'r', encoding='utf-8') as f:
+        texto_claro = f.read()
+    texto_claro = processar_texto(texto_claro)
 
-# Imprime na tela o texto claro
-print("Texto Claro:\t\t", texto_claro)
+    # Obtém a chave, seja diretamente ou por um arquivo
+    if os.path.isfile(chave_ou_arquivo):
+        with open(chave_ou_arquivo, 'r', encoding='utf-8') as f:
+            palavra_chave = f.read().strip()
+    else:
+        palavra_chave = chave_ou_arquivo
+    palavra_chave = processar_texto(palavra_chave)
 
-# Codifica o texto claro usando a função de Cifra de Vigenère
-texto_cifrado = coder_vigerene(texto_claro, palavra_chave)
-print("Texto Cifrado:\t\t", texto_cifrado)
+    # Codifica o texto usando a Cifra de Vigenère
+    texto_cifrado = coder_vigerene(texto_claro, palavra_chave)
+
+    # Imprime na tela o texto claro
+    print("Texto Claro:\t\t", texto_claro)
+
+    # Codifica o texto claro usando a função de Cifra de Vigenère
+    texto_cifrado = coder_vigerene(texto_claro, palavra_chave)
+    print("Texto Cifrado:\t\t", texto_cifrado)
+
+    # Salva o texto cifrado no arquivo de saída
+    with open(arquivo_saida, 'w', encoding='utf-8') as f:
+        f.write(texto_cifrado)
+    print("Texto cifrado salvo no arquivo ", arquivo_saida)
