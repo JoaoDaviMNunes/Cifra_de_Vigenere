@@ -14,5 +14,8 @@ Terminal
 ```
 
 Para visualizar a implementação do Código de Vigenère usando a tabela, verifique o arquivo **coder-decoder-vigenere-tabela.py**.
+<<<<<<< HEAD
 
+=======
+>>>>>>> 175472994f502b656e49e9a1d125ce4194a41bbe
 Para visualizar a implementação do Código de Vigenère usando a matemática e tabela ASCII, verifique o arquivo **coder-decoder-vigenere-ascii.py**.
